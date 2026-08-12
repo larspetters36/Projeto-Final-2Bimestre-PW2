@@ -1,1 +1,4 @@
-Projeto final do segundo bimestre
+Projeto final do segundo bimestre.
+Apresenta a simulação de uma carteira virtual, onde, o saldo do usuário é aumentado e diminuído quando são feitas novas transações. O programa também apresenta uma tabela com todas as transações registradas pelo usuário.
+
+Obs: logo será implementado um banco de dados ao projeto
