@@ -1,6 +1,5 @@
 <?php
 
-require_once 'conexao.php';
 require_once 'classes/Transacao.php';
 require_once 'classes/Receita.php';
 require_once 'classes/Despesa.php';
@@ -14,23 +13,7 @@ if (!isset($_SESSION['carteira'])) {
 }
 
 $carteira = $_SESSION['carteira'];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'cadastrar') {
-    $tipo = trim($_POST['tipo']);
-    $valor = trim($_POST['valor']);
-    $descricao = trim($_POST['descricao']);
-
-    if (!empty($tipo) && !empty($valor) && !empty($descricao)) {
-        $stmt = $pdo->prepare("INSERT INTO transacoes (tipo, valor, descricao) VALUES (:tipo, :valor, :descricao)");
-        $stmt->execute(['tipo' => $tipo, 'valor' => $valor, 'descricao' => $descricao]);
-        header('Location: index.php');
-        exit;
-    }
-}
-$stmt = $pdo->query("SELECT * FROM transacoes ORDER BY id DESC");
-$transacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 
 
 <!DOCTYPE html>
@@ -74,7 +57,7 @@ $transacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="card-body">
 
-                    <form method="POST" >
+                    <form method="POST" action="processa.php">
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">
@@ -87,7 +70,7 @@ $transacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     type="radio"
                                     name="tipo"
                                     id="receita"
-                                    value="Entrada"
+                                    value="entrada"
                                     checked>
 
                                 <label class="form-check-label" for="receita">
@@ -101,7 +84,7 @@ $transacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     type="radio"
                                     name="tipo"
                                     id="despesa"
-                                    value="Saída">
+                                    value="saida">
 
                                 <label class="form-check-label" for="despesa">
                                     Despesa
@@ -160,32 +143,32 @@ $transacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                             <tbody>
 
-                            <?php foreach ($transacoes as $transacao): ?>
+                            <?php foreach ($carteira->getTransacoes() as $transacao): ?>
 
                                 <?php
-                                    $entrada = $transacao['tipo'] === 'Entrada';
+                                    $entrada = $transacao->getTipo() === 'Entrada';
                                 ?>
 
                                 <tr>
                                     <td>
                                         <span class="badge <?= $entrada ? 'bg-success' : 'bg-danger' ?>">
-                                            <?= $transacao['tipo'] ?>
+                                            <?= $transacao->getTipo() ?>
                                         </span>
                                     </td>
 
                                     <td class="<?= $entrada ? 'text-success' : 'text-danger' ?>">
                                         <strong>
                                             R$
-                                            <?= number_format($transacao['valor'], 2, ',', '.') ?>
+                                            <?= number_format($transacao->getValor(), 2, ',', '.') ?>
                                         </strong>
                                     </td>
 
                                     <td>
-                                        <?= htmlspecialchars($transacao['descricao']) ?>
+                                        <?= htmlspecialchars($transacao->getDescricao()) ?>
                                     </td>
 
                                     <td>
-                                        <?= $transacao['data'] ?>
+                                        <?= $transacao->getData() ?>
                                     </td>
                                 </tr>
 
